@@ -1,0 +1,21 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xqs.userservice.mapper.UserMapper">
+
+    <insert id="insertUserInfo">
+        insert into t_user(
+            CODE,
+            USER_NAME,
+            USER_EMAIL,
+            USER_PASSWORD,
+            GMT_CREATE,
+            GMT_MODIFY
+        ) values(
+            replace(UUID(),"-",""),
+            ${userName},
+            #{email},
+            ${password},
+            now(),
+            now(),
+        )
+    </insert>
+</mapper>

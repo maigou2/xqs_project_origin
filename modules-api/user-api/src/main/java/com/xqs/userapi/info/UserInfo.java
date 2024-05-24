@@ -4,11 +4,12 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @TableName("t_user")
-public class UserInfo {
+public class UserInfo implements Serializable {
     @TableField(value = "ID")
     private Integer id;
     @TableField(value = "CODE")
@@ -25,6 +26,8 @@ public class UserInfo {
     private Integer userAge;
     @TableField(value = "USER_SXE")
     private String userSxe;
+    @TableField(value = "STATUS_TYPE")
+    private Integer statusType;
     @TableField(value = "GMT_CREATE")
     private Date gmtCreate;
     @TableField(value = "GMT_MODIFY")
