@@ -11,16 +11,4 @@
         <groupId>com.xqs</groupId>
         <version>0.0.1</version>
     </parent>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.xqs</groupId>
-            <artifactId>common-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
 </project>

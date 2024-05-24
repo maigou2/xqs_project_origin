@@ -18,6 +18,7 @@ public class RedisUtil {
         return template.hasKey(key);
     }
 
+    //字符串操作
     public void set(String key, Object o) {
          template.opsForValue().set(key, o);
     }
