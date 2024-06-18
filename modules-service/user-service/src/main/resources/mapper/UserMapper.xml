@@ -3,19 +3,51 @@
 
     <insert id="insertUserInfo">
         insert into t_user(
+            ID,
             CODE,
             USER_NAME,
             USER_EMAIL,
             USER_PASSWORD,
+            USER_PHONE,
+            USER_TYPE,
             GMT_CREATE,
             GMT_MODIFY
         ) values(
-            replace(UUID(),"-",""),
-            ${userName},
-            #{email},
-            ${password},
+            #{id},
+            #{code},
+            #{userName},
+            #{userEmail},
+            #{userPassword},
+            #{userPhone},
+            #{userType},
             now(),
-            now(),
+            now()
         )
+    </insert>
+    <insert id="addAllUsers">
+        insert into t_user(
+            ID,
+            CODE,
+            USER_NAME,
+            USER_EMAIL,
+            USER_PASSWORD,
+            USER_PHONE,
+            USER_TYPE,
+            GMT_CREATE,
+            GMT_MODIFY
+        ) values
+        <foreach collection="userInfos" item="item" separator=",">
+            (
+                #{item.id},
+                #{item.code},
+                #{item.userName},
+                #{item.userEmail},
+                #{item.userPassword},
+                #{item.userPhone},
+                #{item.userType},
+                now(),
+                now()
+            )
+        </foreach>
     </insert>
 </mapper>

@@ -17,4 +17,10 @@ public class LoginRequestDTO extends BaseRequestDTO {
 
     @ApiModelProperty("密码-确认")
     private String passwordSec;
+
+    @ApiModelProperty("电话")
+    private String phone;
+
+    @ApiModelProperty("用户类型 1:前端用户,2商户用户,3后台管理员 逗号隔开")
+    private String userType;
 }

@@ -1,15 +1,26 @@
 package com.xqs.userservice.service.impl;
 
+import com.github.pagehelper.PageInfo;
+import com.xqs.commoncore.exception.MyException;
+import com.xqs.commoncore.util.ObjectUtil;
+import com.xqs.commoncore.util.RedisUtil;
+import com.xqs.commoncore.util.ThreadUtil;
+import com.xqs.userapi.info.UserInfo;
 import com.xqs.userservice.request.redis.RedisTestRequestDTO;
+import com.xqs.userservice.request.user.UserInfoRequestDTO;
 import com.xqs.userservice.service.RedisTestService;
-import org.springframework.data.redis.core.RedisTemplate;
+import com.xqs.userservice.service.UserService;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import javax.lang.model.type.IntersectionType;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
@@ -20,45 +31,36 @@ public class RedisTestServiceImpl implements RedisTestService {
     private ExecutorService executorService;
 
     @Resource
-    private RedisTemplate redisTemplate;
+    private RedisUtil redisUtil;
+
+    @Resource
+    private UserService userService;
 
     @Override
-    public void testRedisPushList(RedisTestRequestDTO request) throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(request.getMaxValue());
-        for (int i = 1; i <= request.getMaxValue(); i++) {
-            int finalI = i;
-            executorService.submit(() -> {
-                this.redisPushLeftList(latch, request.getKey(), "第" + finalI + "个元素");
-            });
-        }
-        latch.await();
+    public void testRedisPushList(RedisTestRequestDTO request){
+        UserInfoRequestDTO userInfoRequestDTO = new UserInfoRequestDTO();
+        userInfoRequestDTO.setPageNum(1);
+        userInfoRequestDTO.setPageSize(50);
+        PageInfo<UserInfo> userInfos = userService.getAllUserByPage(userInfoRequestDTO);
+        redisUtil.opsForList().leftPushAll(request.getKey(), userInfos.getList());
     }
 
     @Override
-    public void testRedisPopList(RedisTestRequestDTO request) throws InterruptedException {
-        List<String> pulledData = new ArrayList<>();
-        for (int i = 1; i <= request.getMaxValue(); i++) {
-            int finalI = i;
-            int finalI1 = i;
-            if(!redisTemplate.hasKey(request.getKey())) {
-                System.out.println("已经取完了");
-                break;
-            }
-            executorService.submit(() -> {
-                this.redisGetLeftList(request.getKey(), finalI1, pulledData);
-            });
-        }
+    public String testRedisPopList(RedisTestRequestDTO request){
+//        List<UserInfo> userInfos = redisUtil.opsForList().range("userInfosList", 0, 1000);
+//        redisUtil.opsForList().remove("userInfosList", 0, 1000);
+        return "";
     }
 
     @Override
     public void testAddRedisMaxCount(RedisTestRequestDTO request) {
-        redisTemplate.opsForValue().set(request.getKey(), request.getMaxValue());
+        redisUtil.opsForValue().set(request.getKey(), request.getMaxValue());
     }
 
     @Override
     public String testAddRedisAddOrSub(RedisTestRequestDTO request) {
 
-        Object o = redisTemplate.opsForValue().get(request.getKey());
+        Object o = redisUtil.opsForValue().get(request.getKey());
 
         if (StringUtils.isEmpty(o)) {
             return "没有当前商品数据";
@@ -69,38 +71,33 @@ public class RedisTestServiceImpl implements RedisTestService {
             return "当前商品已售完";
         }
 
-        Long surplus = redisTemplate.opsForValue().decrement(request.getKey(), 1);
+        Long surplus = redisUtil.opsForValue().decrement(request.getKey(), 1);
 
         if(surplus < 0) {
-            redisTemplate.opsForValue().increment(request.getKey(), 1);
+            redisUtil.opsForValue().increment(request.getKey(), 1);
             return "当前商品已售完";
         }
-
-//        if (request.getOperationType() == 0) {
-//            //加法
-//            operationCount = redisTemplate.opsForValue().increment(request.getKey(), 1);
-//        } else if (request.getOperationType() == 1) {
-//            //减法
-//            operationCount = redisTemplate.opsForValue().decrement(request.getKey(), 1);
-//        } else if (request.getOperationType() == 2) {
-//            //乘法
-//
-//        } else if (request.getOperationType() == 3) {
-//            //除法
-//
-//        }
-//        redisTemplate.opsForValue().get(request.getKey()).toString();
-
         return "购买成功";
     }
 
+    @Override
+    public String testRedisLock(RedisTestRequestDTO request) throws InterruptedException {
+        String result = redisUtil.opsForValue().setIfAbsent(request.getKey(), ObjectUtil.getUUID(), Duration.ofSeconds(5)) ? "获取锁成功" : "获取锁失败";
+        return result;
+    }
+
+    @Override
+    public Boolean delRedisByKey(String key) {
+        return redisUtil.del(key);
+    }
+
     private void redisPushLeftList(CountDownLatch latch, String key, String value) {
-        redisTemplate.opsForList().leftPush(key, value);
+        redisUtil.opsForList().leftPush(key, value);
         latch.countDown();
     }
 
     private void redisGetLeftList(String key, int index, List<String> pulledData) {
-        Object o = redisTemplate.opsForList().leftPop(key);
+        Object o = redisUtil.opsForList().leftPop(key);
         if (StringUtils.isEmpty(o)) {
             return;
         }

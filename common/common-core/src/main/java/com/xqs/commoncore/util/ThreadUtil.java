@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class ThreadUtil {
     @Bean(value = "executorService")
     public ExecutorService getExecutorService() {
-        return new ThreadPoolExecutor(20, 20, 3600, TimeUnit.SECONDS, new ArrayBlockingQueue<>(2000));
+        return new ThreadPoolExecutor(20, 50, 3600, TimeUnit.SECONDS, new ArrayBlockingQueue<>(2000));
     }
 
 }

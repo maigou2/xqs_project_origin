@@ -1,6 +1,5 @@
 package com.xqs.commoncore.util;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.*;
@@ -10,7 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 
 @Component
-public class RedisUtil{
+public class StrRedisUtil {
 
     //        if (request.getOperationType() == 0) {
     //            //加法
@@ -25,26 +24,21 @@ public class RedisUtil{
     //            //除法
     //
     //        }
-
-    @Qualifier("redisTemplate")
+    @Qualifier("stringRedisTemplate")
     @Autowired
-    private RedisTemplate template;
+    private StringRedisTemplate template;
 
     public boolean hasKey(String key) {
         return template.hasKey(key);
     }
 
     //字符串操作
-    public void set(String key, Object o) {
+    public void set(String key, String o) {
          template.opsForValue().set(key, o);
     }
 
-    public void set(String key, Object o, long time) {
-         template.opsForValue().set(key, o, time);
-    }
-
-    public void set(String key, Object o, Duration duration) {
-         template.opsForValue().set(key, o, duration);
+    public void set(String key, String str, Duration duration) {
+         template.opsForValue().set(key, str, duration);
     }
 
     public boolean del(String key) {
@@ -64,6 +58,14 @@ public class RedisUtil{
             return new ArrayList<>();
         }
         return template.opsForValue().get(key);
+    }
+
+    public void intValueSet(String key, String value) {
+        template.opsForValue().set(key, value);
+    }
+
+    public void intValueSet(String key, String value, Duration duration) {
+        template.opsForValue().set(key, value, duration);
     }
 
     public long increment(String key, int value) {

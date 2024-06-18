@@ -39,6 +39,7 @@ public class BaseResponseDTO<T> implements Serializable {
         BaseResponseDTO<T> resultData = new BaseResponseDTO<>();
         resultData.setCode(ResultEnum.SUCCESS.getCode());
         resultData.setMessage(msg);
+        resultData.setData((T) msg);
         return resultData;
     }
 
@@ -53,6 +54,14 @@ public class BaseResponseDTO<T> implements Serializable {
         BaseResponseDTO<T> resultData = new BaseResponseDTO<>();
         resultData.setCode(ResultEnum.FAIL.getCode());
         resultData.setMessage(ResultEnum.FAIL.getMessage());
+        resultData.setSuccess(false);
+        return resultData;
+    }
+
+    public static <T> BaseResponseDTO<T> fail(Integer code, String msg) {
+        BaseResponseDTO<T> resultData = new BaseResponseDTO<>();
+        resultData.setCode(code);
+        resultData.setMessage(msg);
         resultData.setSuccess(false);
         return resultData;
     }

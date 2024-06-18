@@ -10,6 +10,8 @@ import java.util.List;
 public enum ResultEnum {
   SUCCESS(200,"成功"),
   FAIL(201,"失败"),
+  NOT_LOGIN(40001,"未登录"),
+  OTHER(50000,"未登录"),
 
   ;
 
